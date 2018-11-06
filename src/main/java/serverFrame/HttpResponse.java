@@ -1,3 +1,4 @@
+package serverFrame;
 import java.io.PrintWriter;
 
 public class HttpResponse {
@@ -21,6 +22,10 @@ public class HttpResponse {
 	
 	public PrintWriter prepareWriter() {
 		this.writer.write(status + headers + "\r\n");
+		return this.writer;
+	}
+	
+	public PrintWriter getWriter() {
 		return this.writer;
 	}
 }

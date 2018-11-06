@@ -1,3 +1,4 @@
+package searchApplication;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.TreeMap;
@@ -6,6 +7,10 @@ import invertedIndex.AmazonDataBase;
 import invertedIndex.AmazonMessage;
 import invertedIndex.AmazonReview;
 import invertedIndex.InvertedIndex;
+import serverFrame.BasicHandler;
+import serverFrame.HttpConstants;
+import serverFrame.HttpRequest;
+import serverFrame.HttpResponse;
 
 public class SearchHandler extends BasicHandler{
 	private AmazonDataBase base;
@@ -18,17 +23,10 @@ public class SearchHandler extends BasicHandler{
 	public void doGet(HttpRequest request, HttpResponse response) {
 		request.printRequest();
 		// TODO Auto-generated method stub
-		response.setStatus(HttpConstants.OK_HEADER);
-		response.setContentType("text/html");
-		PrintWriter writer = response.prepareWriter();
+		PrintWriter writer = okStatus(response);
 		writer.write(simpleHeader("GetSearch"));
-		String page = "<form action=\"reviewsearch\" method=\"post\">" +
-			    "Query: "+
-			    "<input type=\"text\" name=\"query\"> "+
-			    "<input type=\"submit\" value=\"Submit\"></form><hr>"+
-				"</body></html>";
-		writer.write(page);
-		writer.flush();
+		writer.write(simpleForm("reviewsearch", "query"));
+		writer.write(simpleFooter());
 		System.out.println("finish writing");
 	}
 
@@ -36,16 +34,22 @@ public class SearchHandler extends BasicHandler{
 	public void doPost(HttpRequest request, HttpResponse response) {
 		// TODO Auto-generated method stub
 		request.printRequest();
-		String query = request.getParam("query");
-		TreeMap<Integer, ArrayList<AmazonMessage>> data = base.reviewSearch(query);
-		response.setStatus(HttpConstants.OK_HEADER);
-		response.setContentType("text/html");
-		PrintWriter writer = response.prepareWriter();
-		writer.write(simpleHeader("PostSearch"));
-		if(data == null) {
-			writer.write("No such result</body></html>");
+		PrintWriter writer = okStatus(response);
+		if(!checkParam("query", request, response)) {
 			return;
 		}
+		String query = request.getParam("query").toLowerCase();
+		TreeMap<Integer, ArrayList<AmazonMessage>> data = base.reviewSearch(query);
+		writer.write(simpleHeader("PostSearch"));
+		
+		//check if the we have the data
+		if(data == null) {
+			writer.write("<p>No such result</p>");
+			writer.write(simpleFooter());
+			return;
+		}
+		
+		//write the result table;
 		writer.write(TableStyle);
 		writer.write("<tr><th>Word Frequency</th><th>Review Id</th><th>Score</th><th>Text</th></tr>");
 		int count = 0;
@@ -65,7 +69,8 @@ public class SearchHandler extends BasicHandler{
 				break;
 			}
 		}
-		writer.write("</table></body></html>");
+		writer.write("</table>");
+		writer.write(simpleFooter());
 	}
 
 }

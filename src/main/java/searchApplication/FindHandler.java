@@ -1,3 +1,4 @@
+package searchApplication;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.TreeMap;
@@ -6,6 +7,10 @@ import invertedIndex.AmazonDataBase;
 import invertedIndex.AmazonMessage;
 import invertedIndex.AmazonQA;
 import invertedIndex.AmazonReview;
+import serverFrame.BasicHandler;
+import serverFrame.HttpConstants;
+import serverFrame.HttpRequest;
+import serverFrame.HttpResponse;
 
 public class FindHandler extends BasicHandler{
 	private AmazonDataBase base;
@@ -17,18 +22,10 @@ public class FindHandler extends BasicHandler{
 	public void doGet(HttpRequest request, HttpResponse response) {
 		// TODO Auto-generated method stub
 		request.printRequest();
-		// TODO Auto-generated method stub
-		response.setStatus(HttpConstants.OK_HEADER);
-		response.setContentType("text/html");
-		PrintWriter writer = response.prepareWriter();
+		PrintWriter writer = okStatus(response);
 		writer.write(simpleHeader("GetFind"));
-		String page = "<form action=\"find\" method=\"post\">" +
-			    "Asin: "+
-			    "<input type=\"text\" name=\"asin\"> "+
-			    "<input type=\"submit\" value=\"Submit\"></form><hr>"+
-				"</body></html>";
-		writer.write(page);
-		writer.flush();
+		writer.write(simpleForm("find", "asin"));
+		writer.write(simpleFooter());
 		System.out.println("finish writing");
 	}
 
@@ -36,12 +33,13 @@ public class FindHandler extends BasicHandler{
 	public void doPost(HttpRequest request, HttpResponse response) {
 		// TODO Auto-generated method stub
 		request.printRequest();
+		PrintWriter writer = okStatus(response);
+		if(!checkParam("asin", request, response)) {
+			return;
+		}
 		String asin = request.getParam("asin");
 		ArrayList<AmazonMessage> reviewList = base.findReviewAsin(asin);
 		ArrayList<AmazonMessage> qaList = base.findQAAsin(asin);
-		response.setStatus(HttpConstants.OK_HEADER);
-		response.setContentType("text/html");
-		PrintWriter writer = response.prepareWriter();
 		writer.write(simpleHeader("PostSearch"));
 		writer.write("<p>Asin Searched: " + asin + "</p>");
 		writer.write("<p>Review Table</p>");
@@ -83,7 +81,8 @@ public class FindHandler extends BasicHandler{
 						+ ar.getAnswer() + "</td></tr>");
 				count++;
 			}
-			writer.write("</table></body></html>");
+			writer.write("</table>");
+			writer.write(simpleFooter());
 			System.out.println("finish writing");
 		}
 	}

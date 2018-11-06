@@ -1,3 +1,4 @@
+package serverFrame;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,13 +21,12 @@ public class SocketWorker implements Runnable{
 			PrintWriter writer = new PrintWriter(sock.getOutputStream(), true)){
 			String line = oneLine(instream);
 			String request = line;
-			System.out.print(request);
+			System.out.print("--------------------\n" + request);
 			//check if GET or POST
 			if(!request.startsWith("GET") && !request.startsWith("POST")) {
 				writer.write(HttpConstants.METHOD_NOT_ALLOWED);
 				return;
 			}
-			System.out.println("Method Test Passed");
 			//check args and build request
 			String[] args = request.split(" ");
 			HttpRequest webRequest = new HttpRequest();
@@ -34,7 +34,6 @@ public class SocketWorker implements Runnable{
 				writer.write(HttpConstants.BAD_REQUEST);
 				return;
 			}
-			System.out.println("Request builder passed");
 			
 			//check handlers have the path
 			if(!this.handleMap.containsKey(webRequest.getPath())) {
@@ -42,7 +41,6 @@ public class SocketWorker implements Runnable{
 				return;
 			}
 			Handler handler = this.handleMap.get(webRequest.getPath());
-			System.out.println("get the handler");
 			
 			int length = -1;
 			while(line != null && !line.trim().isEmpty()) {
@@ -63,14 +61,18 @@ public class SocketWorker implements Runnable{
 				while(read < length) {
 					read += sock.getInputStream().read(bytes, read, (bytes.length-read));
 				}
-				
+				System.out.println("body: " + new String(bytes));
 				webRequest.addParams(new String(bytes));
 			}
 			
-			System.out.println("start response");
+			//handle the request
 			HttpResponse response = new HttpResponse(writer);
 			handler.handle(webRequest, response);
-//			sock.close();
+			
+			//end the sock
+			writer.flush();
+			writer.close();
+			sock.close();
 			
 			
 		} catch (IOException e) {

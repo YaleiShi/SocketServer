@@ -1,3 +1,4 @@
+package chatApplication;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -6,42 +7,54 @@ import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import serverFrame.BasicHandler;
+import serverFrame.HttpConstants;
+import serverFrame.HttpRequest;
+import serverFrame.HttpResponse;
+
 public class ChatHandler extends BasicHandler{
-	private final String TOKEN = "xoxp-378520430422-422686698807-473070785030-a5b0d935fcb997054f9f1907cfaecf86";
-	private final String CHANEL = "#project3";
-	private final String URL = "https://slack.com/api/chat.postMessage";
+	private String token;
+	private String channel;
+	private String url;
+	
+	public ChatHandler(String token, String channel, String url) {
+		this.token = token;
+		this.channel = channel;
+		this.url = url;
+	}
 	
 	@Override
 	public void doGet(HttpRequest request, HttpResponse response) {
 		// TODO Auto-generated method stub
 		request.printRequest();
-		response.setStatus(HttpConstants.OK_HEADER);
-		response.setContentType("text/html");
-		PrintWriter writer = response.prepareWriter();
+		PrintWriter writer = okStatus(response);
 		writer.write(simpleHeader("GetSlackbot"));
-		String page = "<form action=\"slackbot\" method=\"post\">" +
-			    "Message: "+
-			    "<input type=\"text\" name=\"message\"> "+
-			    "<input type=\"submit\" value=\"Submit\"></form><hr>"+
-				"</body></html>";
+		String page = simpleForm("slackbot", "message");
 		writer.write(page);
-		writer.flush();
+		writer.write(simpleFooter());
 	}
 
 	@Override
 	public void doPost(HttpRequest request, HttpResponse response) {
 		// TODO Auto-generated method stub
 		request.printRequest();
+		
+		PrintWriter writer = okStatus(response);
+		if(!checkParam("message", request, response)) {
+			return;
+		}
 		String message = request.getParam("message");
-		String body = "token=" + TOKEN + "&channel=" + CHANEL + "&text=" + message;
+		@SuppressWarnings("deprecation")
+		String body = "token=" + token + "&channel=" + channel + "&text=" + URLEncoder.encode(message);
 		URL url;
 		try {
-			url = new URL(URL);
+			url = new URL(this.url);
 			
 			//create secure connection 
 			HttpsURLConnection connection = (HttpsURLConnection)url.openConnection();
@@ -56,7 +69,7 @@ public class ChatHandler extends BasicHandler{
 			DataOutputStream output = new DataOutputStream(connection.getOutputStream());
 			output.writeBytes(body);
 			
-			printHeaders(connection);
+//			printHeaders(connection);
 			printBody(connection);
 			
 			output.close();
@@ -69,18 +82,11 @@ public class ChatHandler extends BasicHandler{
 			e.printStackTrace();
 		}
 		
-		response.setStatus(HttpConstants.OK_HEADER);
-		response.setContentType("text/html");
-		PrintWriter writer = response.prepareWriter();
-		writer.write(simpleHeader("GetSlackbot"));
-		String page = "<p>Message Already Sent</p>"
-				+ "<form action=\"slackbot\" method=\"post\">" +
-			    "Message: "+
-			    "<input type=\"text\" name=\"message\"> "+
-			    "<input type=\"submit\" value=\"Submit\"></form><hr>"+
-				"</body></html>";
-		writer.write(page);
-		writer.flush();
+		//write the page
+		writer.write(simpleHeader("PostSlackbot"));
+		writer.write("<p>Message Sent</p>");
+		writer.write(simpleForm("slackbot", "message"));
+		writer.write(simpleFooter());
 		
 	}
 	

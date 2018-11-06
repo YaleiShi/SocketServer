@@ -1,3 +1,4 @@
+package serverFrame;
 
 public class HttpConstants {
 	public static final String OK_HEADER = "HTTP/1.0 200 OK\n";

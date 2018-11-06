@@ -1,8 +1,11 @@
+package serverFrame;
+
+import java.io.PrintWriter;
 
 public abstract class BasicHandler implements Handler {
 	protected final int LIMIT = 50;
 	protected static final String TableStyle = 
-			"<table border=2 border-spacing=3px style=\"width:50%\"><style>\r\n" + 
+			"<table border=2 border-spacing=3px style=\"width:100%\"><style>\r\n" + 
 			"table {\r\n" + 
 			"    font-family: arial, sans-serif;\r\n" + 
 			"    width: 200%;\r\n" + 
@@ -38,6 +41,40 @@ public abstract class BasicHandler implements Handler {
 		sb.append("<center>");
 		sb.append("<h1>This is inverted index api</h1>");
 		return sb.toString();
+	}
+	
+	protected String simpleFooter() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("</center>");
+		sb.append("</body>");
+		sb.append("</html>");
+		return sb.toString();
+	}
+	
+	protected String simpleForm(String path, String query) {
+		String form = "<form action=\"" + path + "\" method=\"post\">" +
+			    "Query: "+
+			    "<input type=\"text\" name=\"" + query + "\"> "+
+			    "<input type=\"submit\" value=\"Submit\"></form><hr/>";
+		return form;
+	}
+	
+	protected boolean checkParam(String key, HttpRequest request, HttpResponse response) {
+		if(!request.hasParam(key)) {
+			PrintWriter pw = response.getWriter();
+			pw.write(simpleHeader("Not Enough Parameters"));
+			pw.write("<p>Need Parameter: " + key + "</p>");
+			pw.write(simpleFooter());
+			return false;
+		}
+		return true;
+	}
+	
+	protected PrintWriter okStatus(HttpResponse response) {
+		response.setStatus(HttpConstants.OK_HEADER);
+		response.setContentType("text/html");
+		PrintWriter writer = response.prepareWriter();
+		return writer;
 	}
 
 }

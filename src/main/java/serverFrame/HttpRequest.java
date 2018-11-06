@@ -1,3 +1,6 @@
+package serverFrame;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.HashMap;
 
 public class HttpRequest {
@@ -55,14 +58,26 @@ public class HttpRequest {
 		return path;
 	}
 	
+	public boolean hasParam(String key) {
+		return this.params.containsKey(key);
+	}
+	
 	public String getParam(String key) {
 		if(!this.params.containsKey(key)) {
 			return null;
 		}
-		return this.params.get(key);
+		String s = this.params.get(key);
+		try {
+			s = URLDecoder.decode(s,"UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return s;
 	}
 	
 	public void printRequest() {
+		System.out.println("type: " + type + "; path: " + path);
 		for(String s: this.params.keySet()) {
 			System.out.println("param: " + s + " -> " + this.params.get(s));
 		}

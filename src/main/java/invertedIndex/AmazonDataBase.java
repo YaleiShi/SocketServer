@@ -17,6 +17,8 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.MalformedJsonException;
 
+import serverFrame.ConfigReader;
+
 /**
  * the process class
  * process the json file and save all the data into data base
@@ -29,6 +31,7 @@ public class AmazonDataBase {
 	private InvertedIndex forQA;
 	private String inputReview;
 	private String inputQA;
+	private int limitLine;
 	
 	/**
 	 * constructor of the processor
@@ -38,8 +41,10 @@ public class AmazonDataBase {
 	private AmazonDataBase() {
 		this.forReview = new InvertedIndex();
 		this.forQA = new InvertedIndex();
-		this.inputReview = "Cell_Phones_and_Accessories_5.json";
-		this.inputQA = "qa_Cell_Phones_and_Accessories.json";
+		ConfigReader cr = new ConfigReader("config.json");
+		this.inputReview = cr.getConfig("inputReview");
+		this.inputQA = cr.getConfig("inputQA");
+		this.limitLine = Integer.parseInt(cr.getConfig("limitLine"));
 		process();
 	}
 	
@@ -87,7 +92,7 @@ public class AmazonDataBase {
 		try(BufferedInputStream stream = new BufferedInputStream(new FileInputStream(new File(input)));
 			BufferedReader reader = new BufferedReader(new InputStreamReader(stream, "ISO-8859-1"),10 * 1024 * 1024)){
 			String line = reader.readLine();
-			while(line != null && read <= 20000) {
+			while(line != null && read <= limitLine) {
 				read++;
 				JsonElement element;
 				try {
