@@ -6,6 +6,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * http server
+ * use socket server to accept http request
+ * use thread pool to process the request
+ * @author yalei
+ *
+ */
 public class HttpServer {
 	private ConcurrentHashMap<String, Handler> handleMap;
 	private ServerSocket server;
@@ -14,6 +21,11 @@ public class HttpServer {
 	private int port;
 	private ExecutorService pool;
 	
+	/**
+	 * pass the port number into the server
+	 * start up the thread pool and concurrent hash map
+	 * @param port
+	 */
 	public HttpServer(int port) {
 		this.port = port;
 		this.running = true;
@@ -21,10 +33,20 @@ public class HttpServer {
 		this.pool = Executors.newFixedThreadPool(SIZE);
 	}
 	
+	/**
+	 * add the handler into the hash map
+	 * @param key
+	 * @param handler
+	 */
 	public void addHandler(String key, Handler handler) {
 		this.handleMap.put(key, handler);
 	}
 	
+	/**
+	 * start the server by the port number
+	 * check if start successfully,
+	 * then keep receiving sock and pass it into the thread pool
+	 */
 	public void start() {
 		server = null;
 		

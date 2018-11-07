@@ -14,36 +14,55 @@ import serverFrame.HttpConstants;
 import serverFrame.HttpRequest;
 import serverFrame.HttpResponse;
 
+/**
+ * the find handler which handle the URL: /find
+ * @author yalei
+ *
+ */
 public class FindHandler extends BasicHandler{
 	private AmazonDataBase base;
+	private final String KEY = "asin";
 	
+	/**
+	 * get the data base from the singleton data base
+	 */
 	public FindHandler() {
 		this.base = AmazonDataBase.getInstance();
 	}
+	
+	/**
+	 * handle the get method
+	 * output the form
+	 */
 	@Override
 	public void doGet(HttpRequest request, HttpResponse response) {
 		// TODO Auto-generated method stub
 		request.printRequest();
 		PrintWriter writer = okStatus(response);
 		writer.write(simpleHeader("GetFind"));
-		writer.write(simpleForm("find", "asin"));
+		writer.write(simpleForm("find", KEY));
 		writer.write(simpleFooter());
 		System.out.println("finish writing");
 	}
 
+	/**
+	 * handle the post method
+	 * output the table or empty page if nothing found
+	 * or bad request if query have multiple components
+	 */
 	@Override
 	public void doPost(HttpRequest request, HttpResponse response) {
 		// TODO Auto-generated method stub
 		request.printRequest();
-		if(request.hasParam("asin") && request.getParam("asin").split(" ").length > 1) {
+		if(request.hasParam(KEY) && request.getParam(KEY).split(" ").length > 1) {
 			badRequest(response);
 			return;
 		}
 		PrintWriter writer = okStatus(response);
-		if(!checkParam("asin", request, response)) {
+		if(!checkParam(KEY, request, response)) {
 			return;
 		}
-		String asin = request.getParam("asin").trim();
+		String asin = request.getParam(KEY).trim();
 		
 		ArrayList<AmazonMessage> reviewList = base.findReviewAsin(asin);
 		ArrayList<AmazonMessage> qaList = base.findQAAsin(asin);

@@ -8,9 +8,18 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+/**
+ * config reader used to read and return the value of the config
+ * @author yalei
+ *
+ */
 public class ConfigReader {
 	private JsonObject object;
 	
+	/**
+	 * construct the config reader by reading the config file
+	 * @param input
+	 */
 	public ConfigReader(String input) {
 		JsonParser jp = new JsonParser();
 		try(BufferedReader reader = new BufferedReader(new FileReader(input))){
@@ -23,6 +32,11 @@ public class ConfigReader {
 		}
 	}
 	
+	/**
+	 * get the values as a String
+	 * @param key
+	 * @return
+	 */
 	public String getConfig(String key) {
 		return object.get(key).getAsString();
 	}

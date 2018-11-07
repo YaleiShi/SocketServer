@@ -1,5 +1,10 @@
 package serverFrame;
 
+/**
+ * Store the constants of headers
+ * @author yalei
+ *
+ */
 public class HttpConstants {
 	public static final String OK_HEADER = "HTTP/1.0 200 OK\n";
 	public static final String METHOD_NOT_ALLOWED = "HTTP/1.0 405 Method Not Allowed\n";

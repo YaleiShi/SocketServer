@@ -2,6 +2,12 @@ package serverFrame;
 
 import java.io.PrintWriter;
 
+/**
+ * the basic handler abstract class
+ * store the Constants value and method
+ * @author yalei
+ *
+ */
 public abstract class BasicHandler implements Handler {
 	protected final int LIMIT = 50;
 	protected static final String TableStyle = "<style>\r\n" + 
@@ -24,6 +30,10 @@ public abstract class BasicHandler implements Handler {
 			"<table style=\"width:100%\">";
 
 
+	/**
+	 * check the method of the request
+	 * send it to the right place;
+	 */
 	public void handle(HttpRequest request, HttpResponse response) {
 		// TODO Auto-generated method stub
 		if(request.getType().equals("GET")) {
@@ -33,10 +43,26 @@ public abstract class BasicHandler implements Handler {
 		}
 	}
 	
+	/**
+	 * abstract method 
+	 * handle the get method
+	 * @param request
+	 * @param response
+	 */
 	public abstract void doGet(HttpRequest request, HttpResponse response);
 	
+	/**
+	 * handle the post method
+	 * @param request
+	 * @param response
+	 */
 	public abstract void doPost(HttpRequest request, HttpResponse response);
 	
+	/**
+	 * prepare a simple header for the html page
+	 * @param title
+	 * @return
+	 */
 	protected String simpleHeader(String title) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("<!DOCTYPE html><html><head><title>" + title + "</title></head><body>");
@@ -44,6 +70,10 @@ public abstract class BasicHandler implements Handler {
 		return sb.toString();
 	}
 	
+	/**
+	 * prepare a simple footer for the html page
+	 * @return
+	 */
 	protected String simpleFooter() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("</body>");
@@ -51,6 +81,12 @@ public abstract class BasicHandler implements Handler {
 		return sb.toString();
 	}
 	
+	/**
+	 * prepare a simple form for the html page
+	 * @param path
+	 * @param query
+	 * @return
+	 */
 	protected String simpleForm(String path, String query) {
 		String form = "<form action=\"" + path + "\" method=\"post\">" +
 			    "Query: "+
@@ -59,6 +95,15 @@ public abstract class BasicHandler implements Handler {
 		return form;
 	}
 	
+	/**
+	 * check the request to see if it has the key parameter
+	 * if not, out put the html page and return false
+	 * if has, return true, let the upper method do the rest things
+	 * @param key
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	protected boolean checkParam(String key, HttpRequest request, HttpResponse response) {
 		if(!request.hasParam(key)) {
 			PrintWriter pw = response.getWriter();
@@ -70,6 +115,11 @@ public abstract class BasicHandler implements Handler {
 		return true;
 	}
 	
+	/**
+	 * prepare an ok status response and return print writer
+	 * @param response
+	 * @return
+	 */
 	protected PrintWriter okStatus(HttpResponse response) {
 		response.setStatus(HttpConstants.OK_HEADER);
 		response.setContentType("text/html");
@@ -77,6 +127,10 @@ public abstract class BasicHandler implements Handler {
 		return writer;
 	}
 	
+	/**
+	 * prepare a bad request response and return the writer
+	 * @param response
+	 */
 	protected void badRequest(HttpResponse response) {
 		response.setStatus(HttpConstants.BAD_REQUEST);
 		response.setContentType("text/html");

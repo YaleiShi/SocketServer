@@ -34,7 +34,7 @@ public class ChatHandler extends BasicHandler{
 	private static final String KEY = "message";
 	
 	/**
-	 * need token and channel and url, which come
+	 * need token and channel and url, which come from the config
 	 * @param token
 	 * @param channel
 	 * @param url
@@ -46,6 +46,10 @@ public class ChatHandler extends BasicHandler{
 		this.ifSent = false;
 	}
 	
+	/**
+	 * handle the get method
+	 * output a form
+	 */
 	@Override
 	public void doGet(HttpRequest request, HttpResponse response) {
 		// TODO Auto-generated method stub
@@ -57,6 +61,12 @@ public class ChatHandler extends BasicHandler{
 		writer.write(simpleFooter());
 	}
 
+	/**
+	 * handle the post method
+	 * open the https connection and send the request to slack.api
+	 * if the body sent back contain OK: true
+	 * change the ifSent to true
+	 */
 	@Override
 	public void doPost(HttpRequest request, HttpResponse response) {
 		// TODO Auto-generated method stub
@@ -113,6 +123,10 @@ public class ChatHandler extends BasicHandler{
 		
 	}
 	
+	/**
+	 * print out the headers come back from the slack.api
+	 * @param connection
+	 */
 	public static void printHeaders(URLConnection connection) {
 		Map<String,List<String>> headers = connection.getHeaderFields();
 		ifSent = false;
@@ -126,6 +140,12 @@ public class ChatHandler extends BasicHandler{
 		}		
 	}
 
+	/**
+	 * print out the body come back from the slack.api
+	 * if found OK:true, change ifSent to true
+	 * @param connection
+	 * @throws IOException
+	 */
 	public static void printBody(URLConnection connection) throws IOException {
 		BufferedReader reader = new BufferedReader(
 				new InputStreamReader(connection.getInputStream()));
@@ -138,6 +158,11 @@ public class ChatHandler extends BasicHandler{
 		} 
 	}
 	
+	/**
+	 * return the boolean of ifSent
+	 * just for test
+	 * @return
+	 */
 	public static boolean ifSent() {
 		return ifSent;
 	}

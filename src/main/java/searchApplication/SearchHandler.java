@@ -16,33 +16,54 @@ import serverFrame.HttpConstants;
 import serverFrame.HttpRequest;
 import serverFrame.HttpResponse;
 
+/**
+ * the search handler
+ * handle the path: /reviewsearch
+ * @author yalei
+ *
+ */
 public class SearchHandler extends BasicHandler{
 	private AmazonDataBase base;
+	private final String KEY = "query";
 	
+	/**
+	 * get the data from the singleton data base
+	 */
 	public SearchHandler() {
 		this.base = AmazonDataBase.getInstance();
 	}
 
+	/**
+	 * handle the get method
+	 * output the form
+	 */
 	@Override
 	public void doGet(HttpRequest request, HttpResponse response) {
 		request.printRequest();
 		// TODO Auto-generated method stub
 		PrintWriter writer = okStatus(response);
 		writer.write(simpleHeader("GetSearch"));
-		writer.write(simpleForm("reviewsearch", "query"));
+		writer.write(simpleForm("reviewsearch", KEY));
 		writer.write(simpleFooter());
 		System.out.println("finish writing");
 	}
 
+	/**
+	 * handle the post method
+	 * first check the request
+	 * if the key is absent, return not enough parameter
+	 * if the key have two or more components, search them all
+	 * output the table if we have search result
+	 */
 	@Override
 	public void doPost(HttpRequest request, HttpResponse response) {
 		// TODO Auto-generated method stub
 		request.printRequest();
 		PrintWriter writer = okStatus(response);
-		if(!checkParam("query", request, response)) {
+		if(!checkParam(KEY, request, response)) {
 			return;
 		}
-		String query = request.getParam("query").toLowerCase();
+		String query = request.getParam(KEY).toLowerCase();
 		String[] qs = query.split("\\s+");
 		ArrayList<TreeMap<Integer, ArrayList<AmazonMessage>>> list = new ArrayList<TreeMap<Integer, ArrayList<AmazonMessage>>>();
 		for(String q: qs) {

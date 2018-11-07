@@ -6,6 +6,14 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * the runnable socket worker
+ * read the request
+ * check if the request is valid
+ * write the response
+ * @author yalei
+ *
+ */
 public class SocketWorker implements Runnable{
 	private Socket sock;
 	private ConcurrentHashMap<String, Handler> handleMap;
@@ -14,6 +22,11 @@ public class SocketWorker implements Runnable{
 	private HttpRequest webRequest;
 	private HttpResponse response;
 	
+	/**
+	 * start up the worker by the sock and handle map
+	 * @param sock
+	 * @param map
+	 */
 	public SocketWorker(Socket sock, ConcurrentHashMap<String, Handler> map) {
 		this.sock = sock;
 		this.handleMap = map;
@@ -21,6 +34,14 @@ public class SocketWorker implements Runnable{
 		this.webRequest = new HttpRequest();
 		
 	}
+	
+	/**
+	 * open the input stream and output stream
+	 * read the request from the input stream
+	 * check if the request if valid
+	 * return the right status
+	 * call the right handler to handle the request
+	 */
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
@@ -72,6 +93,13 @@ public class SocketWorker implements Runnable{
 		}
 	}
 	
+	/**
+	 * check if the request is valid
+	 * change the passed value by it
+	 * if passed if false, the sock will not handle the request
+	 * @param request
+	 * @param writer
+	 */
 	private void checkErrorExit(String request, PrintWriter writer) {
 		//check if GET or POST
 		if(!request.startsWith("GET") && !request.startsWith("POST")) {
@@ -93,6 +121,12 @@ public class SocketWorker implements Runnable{
 		}
 	}
 	
+	/**
+	 * read the body of the request
+	 * return the string of it
+	 * @param length
+	 * @throws IOException
+	 */
 	private void readBody(int length) throws IOException {
 		byte[] bytes = new byte[length];
 		int read = sock.getInputStream().read(bytes);
@@ -103,8 +137,9 @@ public class SocketWorker implements Runnable{
 		System.out.println("\n" + new String(bytes));
 		webRequest.addParams(new String(bytes));	
 	}
+	
 	/**
-	 * Read a line of bytes until \n character.
+	 * Read a line of bytes until \n character or -1.
 	 * @param instream
 	 * @return
 	 * @throws IOException
