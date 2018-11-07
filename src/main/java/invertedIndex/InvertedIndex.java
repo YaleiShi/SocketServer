@@ -83,22 +83,6 @@ public class InvertedIndex {
 	}
 	
 	/**
-	 * get the term index
-	 * @return the pointer to the term index
-	 */
-	public HashMap<String, TreeMap<Integer, ArrayList<AmazonMessage>>> getTermIndex() {
-		return termIndex;
-	}
-
-	/**
-	 * get the asin index
-	 * @return the pointer to the asin index
-	 */
-	public HashMap<String, ArrayList<AmazonMessage>> getAsinIndex() {
-		return asinIndex;
-	}
-	
-	/**
 	 * output the array list by the asin number
 	 * @param asin asin number
 	 * @return the array list with all the message

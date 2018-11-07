@@ -3,6 +3,8 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
+import org.apache.commons.lang3.StringEscapeUtils;
+
 import invertedIndex.AmazonDataBase;
 import invertedIndex.AmazonMessage;
 import invertedIndex.AmazonQA;
@@ -33,11 +35,16 @@ public class FindHandler extends BasicHandler{
 	public void doPost(HttpRequest request, HttpResponse response) {
 		// TODO Auto-generated method stub
 		request.printRequest();
+		if(request.hasParam("asin") && request.getParam("asin").split(" ").length > 1) {
+			badRequest(response);
+			return;
+		}
 		PrintWriter writer = okStatus(response);
 		if(!checkParam("asin", request, response)) {
 			return;
 		}
-		String asin = request.getParam("asin");
+		String asin = request.getParam("asin").trim();
+		
 		ArrayList<AmazonMessage> reviewList = base.findReviewAsin(asin);
 		ArrayList<AmazonMessage> qaList = base.findQAAsin(asin);
 		writer.write(simpleHeader("PostSearch"));
@@ -56,9 +63,9 @@ public class FindHandler extends BasicHandler{
 				}
 				AmazonReview ar = (AmazonReview) am;
 				writer.write("<tr><td>" 
-						+ ar.getReviewID() + "</td><td>"
-						+ ar.getScore() + "</td><td>"
-						+ ar.getText() + "</td></tr>");
+						+ StringEscapeUtils.escapeHtml4(ar.getReviewID()) + "</td><td>"
+						+ StringEscapeUtils.escapeHtml4(ar.getScore()) + "</td><td>"
+						+ StringEscapeUtils.escapeHtml4(ar.getText()) + "</td></tr>");
 				count++;
 			}
 			writer.write("</table>");
@@ -77,8 +84,8 @@ public class FindHandler extends BasicHandler{
 				}
 				AmazonQA ar = (AmazonQA) am;
 				writer.write("<tr><td>"
-						+ ar.getQuestion() + "</td><td>"
-						+ ar.getAnswer() + "</td></tr>");
+						+ StringEscapeUtils.escapeHtml4(ar.getQuestion()) + "</td><td>"
+						+ StringEscapeUtils.escapeHtml4(ar.getAnswer()) + "</td></tr>");
 				count++;
 			}
 			writer.write("</table>");

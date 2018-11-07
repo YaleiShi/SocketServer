@@ -4,11 +4,11 @@ import java.io.PrintWriter;
 
 public abstract class BasicHandler implements Handler {
 	protected final int LIMIT = 50;
-	protected static final String TableStyle = 
-			"<table border=2 border-spacing=3px style=\"width:100%\"><style>\r\n" + 
+	protected static final String TableStyle = "<style>\r\n" + 
 			"table {\r\n" + 
 			"    font-family: arial, sans-serif;\r\n" + 
-			"    width: 200%;\r\n" + 
+			"    border-collapse: collapse;\r\n" + 
+			"    width: 100%;\r\n" + 
 			"}\r\n" + 
 			"\r\n" + 
 			"td, th {\r\n" + 
@@ -18,9 +18,11 @@ public abstract class BasicHandler implements Handler {
 			"}\r\n" + 
 			"\r\n" + 
 			"tr:nth-child(even) {\r\n" + 
-			"    background-color: rgb(170, 203, 255);\r\n" + 
+			"    background-color: #dddddd;\r\n" + 
 			"}\r\n" + 
-			"</style>";
+			"</style>" + 
+			"<table style=\"width:100%\">";
+
 
 	public void handle(HttpRequest request, HttpResponse response) {
 		// TODO Auto-generated method stub
@@ -37,15 +39,13 @@ public abstract class BasicHandler implements Handler {
 	
 	protected String simpleHeader(String title) {
 		StringBuilder sb = new StringBuilder();
-		sb.append("<html><head><title>" + title + "</title></head><body>");
-		sb.append("<center>");
+		sb.append("<!DOCTYPE html><html><head><title>" + title + "</title></head><body>");
 		sb.append("<h1>This is inverted index api</h1>");
 		return sb.toString();
 	}
 	
 	protected String simpleFooter() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("</center>");
 		sb.append("</body>");
 		sb.append("</html>");
 		return sb.toString();
@@ -54,8 +54,8 @@ public abstract class BasicHandler implements Handler {
 	protected String simpleForm(String path, String query) {
 		String form = "<form action=\"" + path + "\" method=\"post\">" +
 			    "Query: "+
-			    "<input type=\"text\" name=\"" + query + "\"> "+
-			    "<input type=\"submit\" value=\"Submit\"></form><hr/>";
+			    "<input type=\"text\" name=\"" + query + "\"/> "+
+			    "<input type=\"submit\" value=\"Submit\"/></form>";
 		return form;
 	}
 	
@@ -75,6 +75,15 @@ public abstract class BasicHandler implements Handler {
 		response.setContentType("text/html");
 		PrintWriter writer = response.prepareWriter();
 		return writer;
+	}
+	
+	protected void badRequest(HttpResponse response) {
+		response.setStatus(HttpConstants.BAD_REQUEST);
+		response.setContentType("text/html");
+		PrintWriter writer = response.prepareWriter();
+		writer.write(simpleHeader("Bad Request"));
+		writer.write("<p>400 Bad Request</p>");
+		writer.write(simpleFooter());
 	}
 
 }

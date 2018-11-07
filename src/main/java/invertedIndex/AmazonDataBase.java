@@ -183,22 +183,4 @@ public class AmazonDataBase {
 		return this.forQA.getTermMap(term);
 	}
 
-	/**
-	 * get the review index
-	 * @return the review index
-	 */
-	public InvertedIndex getForReview() {
-		return forReview;
-	}
-
-	/**
-	 * get the QA index
-	 * @return the QA index
-	 */
-	public InvertedIndex getForQA() {
-		return forQA;
-	}
-	
-	
-
 }

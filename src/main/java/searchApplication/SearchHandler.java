@@ -1,7 +1,11 @@
 package searchApplication;
 import java.io.PrintWriter;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.TreeMap;
+
+import org.apache.commons.lang3.StringEscapeUtils;
 
 import invertedIndex.AmazonDataBase;
 import invertedIndex.AmazonMessage;
@@ -39,11 +43,18 @@ public class SearchHandler extends BasicHandler{
 			return;
 		}
 		String query = request.getParam("query").toLowerCase();
-		TreeMap<Integer, ArrayList<AmazonMessage>> data = base.reviewSearch(query);
+		String[] qs = query.split("\\s+");
+		ArrayList<TreeMap<Integer, ArrayList<AmazonMessage>>> list = new ArrayList<TreeMap<Integer, ArrayList<AmazonMessage>>>();
+		for(String q: qs) {
+			TreeMap<Integer, ArrayList<AmazonMessage>> data = base.reviewSearch(q);
+			if(data != null) {
+				list.add(data);
+			}
+		}
 		writer.write(simpleHeader("PostSearch"));
 		
 		//check if the we have the data
-		if(data == null) {
+		if(list.size() == 0) {
 			writer.write("<p>No such result</p>");
 			writer.write(simpleFooter());
 			return;
@@ -53,17 +64,22 @@ public class SearchHandler extends BasicHandler{
 		writer.write(TableStyle);
 		writer.write("<tr><th>Word Frequency</th><th>Review Id</th><th>Score</th><th>Text</th></tr>");
 		int count = 0;
-		for(int i: data.keySet()) {
-			for(AmazonMessage am: data.get(i)) {
+		for(TreeMap<Integer, ArrayList<AmazonMessage>> data: list) {
+			for(int i: data.keySet()) {
+				for(AmazonMessage am: data.get(i)) {
+					if(count >= LIMIT) {
+						break;
+					}
+					AmazonReview ar = (AmazonReview) am;
+					writer.write("<tr><td>" + i + "</td><td>" 
+							+ StringEscapeUtils.escapeHtml4(ar.getReviewID()) + "</td><td>"
+							+ StringEscapeUtils.escapeHtml4(ar.getScore()) + "</td><td>"
+							+ StringEscapeUtils.escapeHtml4(ar.getText()) + "</td></tr>");
+					count++;
+				}
 				if(count >= LIMIT) {
 					break;
 				}
-				AmazonReview ar = (AmazonReview) am;
-				writer.write("<tr><td>" + i + "</td><td>" 
-						+ ar.getReviewID() + "</td><td>"
-						+ ar.getScore() + "</td><td>"
-						+ ar.getText() + "</td></tr>");
-				count++;
 			}
 			if(count >= LIMIT) {
 				break;

@@ -10,6 +10,7 @@ public class HttpServer {
 	private ConcurrentHashMap<String, Handler> handleMap;
 	private ServerSocket server;
 	private boolean running;
+	private final int SIZE = 10;
 	private int port;
 	private ExecutorService pool;
 	
@@ -17,7 +18,7 @@ public class HttpServer {
 		this.port = port;
 		this.running = true;
 		this.handleMap = new ConcurrentHashMap<String, Handler>();
-		this.pool = Executors.newFixedThreadPool(10);
+		this.pool = Executors.newFixedThreadPool(SIZE);
 	}
 	
 	public void addHandler(String key, Handler handler) {
